@@ -36,7 +36,7 @@ include($ENV{ESP_MATTER_DEVICE_PATH}/esp_matter_device.cmake)
 
 set(EXTRA_COMPONENT_DIRS
     "${ESP_MATTER_PATH}/examples/common"
-    "${MATTER_SDK_PATH}/config/esp32/components"
+    "${ESP_MATTER_PATH}/connectedhomeip"
     "${ESP_MATTER_PATH}/components"
     "${ESP_MATTER_PATH}/device_hal/device"
     ${extra_components_dirs_append})

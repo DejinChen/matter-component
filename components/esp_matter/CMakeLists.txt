@@ -26,7 +26,7 @@ if (CONFIG_ESP_MATTER_ENABLE_DATA_MODEL)
     list(APPEND INCLUDE_DIRS_LIST "zap_common")
 endif()
 
-set(REQUIRES_LIST       chip bt esp_matter_console nvs_flash app_update esp_secure_cert_mgr mbedtls esp_system openthread)
+set(REQUIRES_LIST       connectedhomeip bt esp_matter_console nvs_flash app_update esp_secure_cert_mgr mbedtls esp_system openthread)
 
 idf_component_register( SRC_DIRS        ${SRC_DIRS_LIST}
                         INCLUDE_DIRS    ${INCLUDE_DIRS_LIST}
