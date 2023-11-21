@@ -1095,3 +1095,8 @@ menu "CHIP Device Layer"
     endmenu
 
 endmenu
+
+source "$ESP_MATTER_PATH/components/esp_matter/Kconfig"
+source "$ESP_MATTER_PATH/components/esp_matter_bridge/Kconfig"
+source "$ESP_MATTER_PATH/components/esp_matter_console/Kconfig"
+source "$ESP_MATTER_PATH/components/esp_matter_controller/Kconfig"

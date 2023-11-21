@@ -1,4 +1,10 @@
 ## IDF Component Manager Manifest File
+version: 0.0.1
+description: An esp-matter library with connectedhomeip
+url: https://github.com/franzbischoff/esp-idf-max32664-hub
+files:
+  exclude:
+    - examples/**/build/*
 dependencies:
     espressif/mdns:
         version: "^1.1.0"
@@ -25,3 +31,6 @@ dependencies:
         rules:
             - if: "idf_version >=5.0"
             - if: "target != esp32h2"
+
+    espressif/json_parser: "~1.0.0"
+    espressif/json_generator: "~1.1.0"

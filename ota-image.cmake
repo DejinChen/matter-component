@@ -14,8 +14,6 @@
 #   limitations under the License.
 #
 
-# cmake_policy(SET CMP0011 NEW) # TODO: cmake_policy is used to resolve the cmake warning
-# cmake_policy(SET CMP0007 NEW)
 find_package(Python3 REQUIRED)
 
 #

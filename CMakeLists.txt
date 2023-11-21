@@ -2,13 +2,27 @@ if(NOT MATTER_SDK_PATH)
     get_filename_component(MATTER_SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/connectedhomeip/ REALPATH)
 endif()
 
+set(MATTER_SDK_PATH "/home/chendejin/Git_clone/without-box-matter/connectedhomeip/connectedhomeip")
+
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
+set(REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
-    list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
+    list(APPEND REQUIRE_COMPONENTS mdns)
 endif()
+
+function(collect_exclude_files PATH INCLUDE_FILES EXCLUDE_LIST)
+    file(GLOB ALL_FILES ${PATH}/*.cpp ${PATH}/*.c)
+    set(EXCLUDE_FILES "")
+    foreach(FILE ${ALL_FILES})
+        list(FIND INCLUDE_FILES ${FILE} EXCLUDE_INDEX)
+        if(EXCLUDE_INDEX LESS 0)
+            list(APPEND EXCLUDE_FILES ${FILE})
+        endif()
+    endforeach()
+    set(${EXCLUDE_LIST} ${EXCLUDE_FILES} PARENT_SCOPE)
+endfunction()
 
 set(SRC_DIRS_LIST "${MATTER_SDK_PATH}/src/access"
                   "${MATTER_SDK_PATH}/src/access/examples"
@@ -53,9 +67,7 @@ set(SRC_DIRS_LIST "${MATTER_SDK_PATH}/src/access"
                   "${MATTER_SDK_PATH}/third_party/nlfaultinjection/src"
                   "${MATTER_SDK_PATH}/zzz_generated/app-common/app-common/zap-generated")
 
-set(INCLUDE_DIRS_LIST "."
-                      "${MATTER_SDK_PATH}"
-                      "${MATTER_SDK_PATH}/src"
+set(INCLUDE_DIRS_LIST "${MATTER_SDK_PATH}/src"
                       "${MATTER_SDK_PATH}/src/access"
                       "${MATTER_SDK_PATH}/src/access/examples"
                       "${MATTER_SDK_PATH}/src/app"
@@ -67,6 +79,7 @@ set(INCLUDE_DIRS_LIST "."
                       "${MATTER_SDK_PATH}/src/controller"
                       "${MATTER_SDK_PATH}/src/credentials"
                       "${MATTER_SDK_PATH}/src/credentials/attestation_verifier"
+                      "${MATTER_SDK_PATH}/src/credentials/examples"
                       "${MATTER_SDK_PATH}/src/credentials/tests"
                       "${MATTER_SDK_PATH}/src/crypto"
                       "${MATTER_SDK_PATH}/src/include"
@@ -96,7 +109,8 @@ set(INCLUDE_DIRS_LIST "."
                       "${MATTER_SDK_PATH}/src/protocols/bdx"
                       "${MATTER_SDK_PATH}/src/protocols/echo"
                       "${MATTER_SDK_PATH}/src/protocols/secure_channel"
-                      "${MATTER_SDK_PATH}/src/pybindings"
+                      "${MATTER_SDK_PATH}/src/protocols/user_directed_commissioning"
+                    #   "${MATTER_SDK_PATH}/src/pybindings"
                       "${MATTER_SDK_PATH}/src/setup_payload"
                       "${MATTER_SDK_PATH}/src/system"
                       "${MATTER_SDK_PATH}/src/tracing"
@@ -141,28 +155,28 @@ set(EXCLUDE_SRCS_LIST "${MATTER_SDK_PATH}/src/app/icd/ICDEventManager.cpp"
                       "${MATTER_SDK_PATH}/src/lib/support/UnitTestUtils.cpp"
                       "${MATTER_SDK_PATH}/src/lib/support/JniReferences.cpp"
                       "${MATTER_SDK_PATH}/src/lib/support/CHIPMem-Simple.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/MainLoopAmeba.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/MainLoopCYW30739.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/MainLoopDefault.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/MainLoopMW320.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/MainLoopSilabs.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/MainLoopZephyr.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_ameba.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_asr.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_bouffalolab.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_cc13x2_26x2.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_cc13x4_26x4.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_cyw30739.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_k32w.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_mbed.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_mt793x.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_mw320.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_nxp.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_openiotsdk.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_qpg.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_silabs.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_stdio.cpp"
-                      "${MATTER_SDK_PATH}/src/lib/shell/streamer_zephyr.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/MainLoopAmeba.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/MainLoopCYW30739.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/MainLoopDefault.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/MainLoopMW320.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/MainLoopSilabs.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/MainLoopZephyr.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_ameba.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_asr.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_bouffalolab.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_cc13x2_26x2.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_cc13x4_26x4.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_cyw30739.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_k32w.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_mbed.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_mt793x.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_mw320.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_nxp.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_openiotsdk.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_qpg.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_silabs.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_stdio.cpp"
+                    #   "${MATTER_SDK_PATH}/src/lib/shell/streamer_zephyr.cpp"
                       "${MATTER_SDK_PATH}/src/lib/shell/commands/NFC.cpp"
                       "${MATTER_SDK_PATH}/src/platform/DeviceSafeQueue.cpp"
                       "${MATTER_SDK_PATH}/src/platform/SyscallStubs.cpp"
@@ -171,8 +185,100 @@ set(EXCLUDE_SRCS_LIST "${MATTER_SDK_PATH}/src/app/icd/ICDEventManager.cpp"
                       "${MATTER_SDK_PATH}/src/system/SystemLayerImplSelect.cpp"
                       "${MATTER_SDK_PATH}/src/transport/TraceMessage.cpp")
 
-list(APPEND INCLUDE_DIRS_LIST "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# list(APPEND INCLUDE_DIRS_LIST "connectedhomeip/include")
 list(APPEND INCLUDE_DIRS_LIST "${CMAKE_CURRENT_BINARY_DIR}")
+
+############################### esp-matter cmakelist.txt
+# Get the list of cluster directories present in ${MATTER_SDK_PATH}/src/app/clusters
+file(GLOB CLUSTER_DIR_LIST true ${MATTER_SDK_PATH}/src/app/clusters/*)
+
+list(APPEND SRC_DIRS_LIST "components/esp_matter"
+                          "components/esp_matter/private"
+                          "${MATTER_SDK_PATH}/zzz_generated/app-common/app-common/zap-generated/attributes"
+                          "${MATTER_SDK_PATH}/src/app/util")
+
+foreach(CLUSTER_DIR ${CLUSTER_DIR_LIST})
+    file(GLOB_RECURSE C_CPP_FILES "${CLUSTER_DIR}/*.c" "${CLUSTER_DIR}/*.cpp")
+    if (C_CPP_FILES)
+        list(APPEND SRC_DIRS_LIST "${CLUSTER_DIR}")
+    endif()
+endforeach()
+
+list(APPEND INCLUDE_DIRS_LIST   "components/esp_matter")
+
+if (CONFIG_ESP_MATTER_ENABLE_DATA_MODEL)
+    list(APPEND SRC_DIRS_LIST "components/esp_matter/zap_common/app")
+    list(APPEND INCLUDE_DIRS_LIST "components/esp_matter/zap_common")
+endif()
+
+list(APPEND REQUIRE_COMPONENTS app_update esp_secure_cert_mgr esp_system esp_timer)
+
+set(PRIV_INCLUDE_DIRS_LIST "components/esp_matter/private")
+
+# idf_component_register( SRC_DIRS        ${SRC_DIRS_LIST}
+#                         INCLUDE_DIRS    ${INCLUDE_DIRS_LIST}
+#                         PRIV_INCLUDE_DIRS "private"
+#                         REQUIRES        ${REQUIRES_LIST})
+
+########################## esp-matter-bridge cmakelist.txt
+list(APPEND SRC_DIRS_LIST "components/esp_matter_bridge")
+list(APPEND INCLUDE_DIRS_LIST "components/esp_matter_bridge")
+# idf_component_register(SRCS            "components/esp_matter_bridge/esp_matter_bridge.cpp"
+#                        INCLUDE_DIRS    "${CMAKE_CURRENT_LIST_DIR}"
+#                        REQUIRES        esp_matter)
+
+
+
+#################################### esp-matter-console cmakelist.txt
+set(srcs_list)
+# if (CONFIG_ENABLE_CHIP_SHELL)
+    list(APPEND SRC_DIRS_LIST "components/esp_matter_console")
+    list(APPEND INCLUDE_DIRS_LIST "components/esp_matter_console")
+# endif()
+
+# idf_component_register(SRCS ${srcs_list}
+#                     INCLUDE_DIRS .
+#                     PRIV_REQUIRES connectedhomeip mbedtls esp_timer bt openthread)
+
+list(APPEND REQUIRE_COMPONENTS json_parser spiffs esp_http_client json_generator)
+###################################### esp-matter-controller cmakelist.txt
+if (CONFIG_ESP_MATTER_CONTROLLER_ENABLE)
+    list(APPEND SRC_DIRS_LIST "components/esp_matter_controller"
+                              "components/esp_matter_controller/logger/zap-generated")
+    list(APPEND INCLUDE_DIRS_LIST "components/esp_matter_controller"
+                                  "components/esp_matter_controller/logger")
+
+    if (CONFIG_ESP_MATTER_CONTROLLER_CUSTOM_CLUSTER_ENABLE)
+        list(APPEND SRC_DIRS_LIST "components/esp_matter_controller/controller_custom_cluster")
+        list(APPEND INCLUDE_DIRS_LIST "components/esp_matter_controller/controller_custom_cluster")
+    endif()
+    if (NOT CONFIG_ESP_MATTER_COMMISSIONER_ENABLE)
+        list(APPEND EXCLUDE_SRCS_LIST "components/esp_matter_controller/esp_matter_commissioner.cpp"
+                                      "components/esp_matter_controller/esp_matter_controller_pairing_command.cpp"
+                                      "components/esp_matter_controller/esp_matter_attestation_trust_store.cpp"
+                                      "components/esp_matter_controller/esp_matter_controller_group_settings.cpp")
+    endif()
+endif()
+
+# idf_component_register(SRC_DIRS ${src_dirs_list}
+#     EXCLUDE_SRCS ${exclude_srcs_list}
+#     INCLUDE_DIRS ${include_dirs_list}
+#     REQUIRES connectedhomeip esp_matter esp_matter_console json_parser spiffs esp_http_client json_generator)
+
+
+##################################### esp-matter-rainmaker cmakelist.txt
+
+idf_build_get_property(rainmaker_enabled RAINMAKER_ENABLED)
+if (${rainmaker_enabled})
+    list(APPEND SRC_DIRS_LIST "components/esp_matter_rainmaker")
+    list(APPEND INCLUDE_DIRS_LIST "components/esp_matter_rainmaker")
+    list(APPEND REQUIRE_COMPONENTS esp_rainmaker)
+endif()
+
+
+# idf_component_register(SRCS             ${SRCS_LIST}
+#                        INCLUDE_DIRS     "."
+#                        REQUIRES         ${REQUIRES_LIST})
 
 # ESP-IDF lets user set software version string by two ways:
 # 1. Project's CMakeLists.txt file and 2. Config option
@@ -224,8 +330,14 @@ else()
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
-    list(APPEND SRC_DIRS_LIST "${MATTER_SDK_PATH}/src/lib/shell"
-                              "${MATTER_SDK_PATH}/src/lib/shell/commands")
+    list(APPEND SRC_DIRS_LIST "${MATTER_SDK_PATH}/src/lib/shell")
+    list(APPEND SRC_DIRS_LIST "${MATTER_SDK_PATH}/src/lib/shell/commands")    
+    set(ESP_SHELL_FILES "${MATTER_SDK_PATH}/src/lib/shell/MainLoopESP32.cpp"
+                        "${MATTER_SDK_PATH}/src/lib/shell/streamer_esp32.cpp"
+                        "${MATTER_SDK_PATH}/src/lib/shell/Engine.cpp"
+                        "${MATTER_SDK_PATH}/src/lib/shell/streamer.cpp")
+    collect_exclude_files("${MATTER_SDK_PATH}/src/lib/shell" "${ESP_SHELL_FILES}" SHELL_EXCLUDE_FILES)
+    list(APPEND EXCLUDE_SRCS_LIST "${SHELL_EXCLUDE_FILES}")
 endif()
 
 if (CONFIG_ENABLE_CHIP_CONTROLLER_BUILD)
@@ -309,10 +421,11 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
     list(APPEND SRC_DIRS_LIST "${MATTER_SDK_PATH}/src/tracing/esp32_trace")
 endif()
 
-idf_component_register(SRC_DIRS             ${SRC_DIRS_LIST}
-                       EXCLUDE_SRCS         ${EXCLUDE_SRCS_LIST}
-                       INCLUDE_DIRS         ${INCLUDE_DIRS_LIST}
-                       PRIV_REQUIRES        ${CHIP_REQUIRE_COMPONENTS})
+idf_component_register(SRC_DIRS          ${SRC_DIRS_LIST}
+                       EXCLUDE_SRCS      ${EXCLUDE_SRCS_LIST}
+                       INCLUDE_DIRS      ${INCLUDE_DIRS_LIST}
+                       PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
+                       REQUIRES          ${REQUIRE_COMPONENTS})
 
 target_compile_options(${COMPONENT_LIB} PUBLIC
                        "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
@@ -326,6 +439,31 @@ endif()
 
 idf_build_set_property(C_COMPILE_OPTIONS "-Wno-error=uninitialized;-Wno-error=maybe-uninitialized;-Wno-format-nonliteral;-Wno-missing-field-initializers" APPEND)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-Wno-error=uninitialized;-Wno-error=maybe-uninitialized;-Wno-format-nonliteral;-Wno-missing-field-initializers" APPEND)
+
+# This has been added to fix the error and should be removed once fixed:
+# esp-matter/connectedhomeip/connectedhomeip/src/app/EventManagement.cpp:467:23: error: 'writer' is
+# used uninitialized in this function
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized;-Wno-error=maybe-uninitialized;-Wno-missing-field-initializers;" APPEND)
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=array-bounds" APPEND)
+
+if (NOT CONFIG_ESP_MATTER_ENABLE_DATA_MODEL)
+    target_include_directories(${COMPONENT_LIB} PUBLIC "${CMAKE_BINARY_DIR}/gen/app-codegen/cpp-app"
+                                                       "${CMAKE_BINARY_DIR}/gen/app-zapgen/zapgen/app-templates")
+endif()
+
+# For Xtensa chips, uint32_t was defined as 'unsigned' before v5.0, and after IDF v5.0 it is defined
+# as 'unsigned long', same as RISC-V. add this compile option to avoid format errors.
+# https://github.com/espressif/esp-idf/issues/6906#issuecomment-1207373706
+if (CONFIG_IDF_TARGET_ARCH_XTENSA AND (${IDF_VERSION_MAJOR} LESS 5))
+    idf_build_set_property(COMPILE_OPTIONS "-Wno-format" APPEND)
+endif()
+
+# Time sync client feature depends on read client, disable it when read client is disabled.
+if (CONFIG_DISABLE_READ_CLIENT)
+    target_compile_options(${COMPONENT_LIB} PUBLIC "-DTIME_SYNC_ENABLE_TSC_FEATURE=0")
+endif()
+
+idf_build_set_property(COMPILE_OPTIONS "-Wno-write-strings" APPEND)
 
 idf_component_get_property(freertos_dir freertos COMPONENT_DIR)
 target_include_directories(${COMPONENT_LIB} PRIVATE
@@ -348,7 +486,7 @@ idf_component_get_property(main_lib main COMPONENT_LIB)
 set(chip_libraries $<TARGET_FILE:${main_lib}>)
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${MATTER_SDK_PATH}/src/tracing/esp32_trace/include")
 endif()
 
 idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
@@ -486,14 +624,7 @@ if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     endif()
 endif()
 
-execute_process(
-    COMMAND date "+%s"
-    OUTPUT_VARIABLE BUILD_SECONDS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-math(EXPR BUILD_SECONDS "${BUILD_SECONDS} - (946684800)")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FirmwareBuildTime.h "#pragma once\n\n")
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/FirmwareBuildTime.h "#define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S ${BUILD_SECONDS}\n\n")
+include(${CMAKE_CURRENT_LIST_DIR}/generate_include_files.cmake)
 
 # Build Matter OTA image
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)

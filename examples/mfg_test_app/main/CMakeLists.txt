@@ -1,4 +1,4 @@
-set(PRIV_REQUIRES_LIST esp_matter bootloader_support)
+# set(PRIV_REQUIRES_LIST esp_matter bootloader_support)
 
 idf_component_register(SRC_DIRS           "."
                        PRIV_INCLUDE_DIRS  "."
